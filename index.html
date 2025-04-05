@@ -3,129 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Countdown Clash</title>
-    <style>
-        /* 90s Arcade + Mobile App Vibes */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #000; /* Black base like an arcade cabinet */
-            font-family: 'Press Start 2P', cursive; /* Classic arcade pixel font */
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            background-image: radial-gradient(circle, rgba(255, 0, 255, 0.1), transparent); /* Neon glow */
-        }
-
-        /* Mobile app container */
-        #app {
-            width: 100%;
-            max-width: 400px; /* Mobile-friendly width */
-            background: #1a1a1a; /* Dark gray like an old screen */
-            border: 4px solid #00ff00; /* Neon green border */
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 20px #00ff00, inset 0 0 10px #ff00ff; /* CRT glow */
-        }
-
-        /* Title */
-        h1 {
-            text-align: center;
-            color: #ff00ff; /* Neon magenta */
-            text-shadow: 0 0 5px #ff00ff, 0 0 10px #00ff00;
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
-
-        /* Add button */
-        #addBtn {
-            background: #ff0000; /* Bright red */
-            color: #fff;
-            border: 2px solid #ffff00; /* Yellow outline */
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            text-shadow: 0 0 3px #000;
-            transition: all 0.2s;
-        }
-        #addBtn:hover {
-            background: #ffff00;
-            color: #ff0000;
-        }
-
-        /* Form */
-        #eventForm {
-            display: none;
-            background: #333;
-            padding: 15px;
-            border: 2px dashed #00ffff; /* Cyan dashed */
-            margin-top: 15px;
-        }
-        #eventForm input {
-            display: block;
-            width: 100%;
-            margin: 10px 0;
-            padding: 8px;
-            background: #000;
-            color: #00ff00;
-            border: 2px solid #ff00ff;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 12px;
-        }
-        #submitBtn {
-            background: #00ff00;
-            color: #000;
-            border: 2px solid #ffff00;
-            padding: 8px;
-            width: 100%;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        #submitBtn:hover {
-            background: #ffff00;
-            color: #ff00ff;
-        }
-
-        /* Event list */
-        #eventList {
-            margin-top: 20px;
-        }
-        #eventList div {
-            background: #000;
-            padding: 10px;
-            margin: 5px 0;
-            border: 2px solid #00ffff;
-            color: #ffff00; /* Yellow text */
-            text-shadow: 0 0 3px #ff00ff;
-            font-size: 14px;
-            word-wrap: break-word;
-        }
-    </style>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="app">
-        <h1>COUNTDOWN CLASH</h1>
-        <!-- Button to add new event -->
-        <button id="addBtn">+</button>
+    <!-- Button to add new event -->
+    <button id="addBtn">+</button>
 
-        <!-- Form to input event details -->
-        <div id="eventForm">
-            <input type="text" id="eventTitle" placeholder="EVENT NAME">
-            <input type="date" id="eventDate">
-            <input type="time" id="eventTime" optional>
-            <button id="submitBtn">✓</button>
-        </div>
-
-        <!-- Where events will show up -->
-        <div id="eventList"></div>
+    <!-- Form to input event details (hidden by default) -->
+    <div id="eventForm" style="display: none;">
+        <input type="text" id="eventTitle" placeholder="Event Title">
+        <input type="date" id="eventDate">
+        <button id="submitBtn">✓</button>
     </div>
+
+    <!-- Where events will show up -->
+    <div id="eventList"></div>
 
     <script>
         // Load events from local storage when page loads
@@ -140,57 +31,36 @@
         document.getElementById('submitBtn').addEventListener('click', () => {
             const title = document.getElementById('eventTitle').value;
             const date = document.getElementById('eventDate').value;
-            const time = document.getElementById('eventTime').value || null;
 
+            // Check if inputs are filled
             if (title && date) {
-                events.push({ title, date, time });
+                // Add new event to array
+                events.push({ title, date });
+                // Save to local storage
                 localStorage.setItem('events', JSON.stringify(events));
+                // Hide form and clear inputs
                 document.getElementById('eventForm').style.display = 'none';
                 document.getElementById('eventTitle').value = '';
                 document.getElementById('eventDate').value = '';
-                document.getElementById('eventTime').value = '';
+                // Update the UI
                 displayEvents();
             }
         });
 
-        // Function to calculate time left and update UI
+        // Function to calculate days left and update UI
         function displayEvents() {
             const eventList = document.getElementById('eventList');
-            eventList.innerHTML = '';
+            eventList.innerHTML = ''; // Clear current list
 
-            // Sort events by date/time (soonest first)
-            events.sort((a, b) => {
-                const dateA = a.time ? new Date(`${a.date}T${a.time}:00`) : new Date(`${a.date}T00:00:00`);
-                const dateB = b.time ? new Date(`${b.date}T${b.time}:00`) : new Date(`${b.date}T00:00:00`);
-                return dateA - dateB;
-            });
-
-            // Display sorted events
-            events.forEach((event) => {
-                const eventDateTime = event.time 
-                    ? new Date(`${event.date}T${event.time}:00`) 
-                    : new Date(`${event.date}T00:00:00`);
+            events.forEach((event, index) => {
+                const eventDate = new Date(event.date);
                 const now = new Date();
-                const timeDiff = eventDateTime - now;
+                const timeDiff = eventDate - now;
+                const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)); // Convert ms to days
 
-                let displayText = event.title + " - ";
-                if (timeDiff > 0) {
-                    if (event.time) {
-                        const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-                        const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-                        const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-                        displayText += `${days}d ${hours}h ${minutes}m ${seconds}s`;
-                    } else {
-                        const days = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-                        displayText += `${days} DAYS`;
-                    }
-                } else {
-                    displayText += "GAME OVER!";
-                }
-
+                // Create a div for each event
                 const eventDiv = document.createElement('div');
-                eventDiv.innerHTML = displayText;
+                eventDiv.innerHTML = `${event.title} - ${daysLeft} days left`;
                 eventList.appendChild(eventDiv);
             });
         }
