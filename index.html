@@ -12,6 +12,7 @@
     <div id="eventForm" style="display: none;">
         <input type="text" id="eventTitle" placeholder="Event Title">
         <input type="date" id="eventDate">
+        <input type="time" id="eventTime"> <!-- ✅ Time input added -->
         <button id="submitBtn">✓</button>
     </div>
 
@@ -31,37 +32,39 @@
         document.getElementById('submitBtn').addEventListener('click', () => {
             const title = document.getElementById('eventTitle').value;
             const date = document.getElementById('eventDate').value;
+            const time = document.getElementById('eventTime').value; // ✅ Get time
 
             // Check if inputs are filled
-            if (title && date) {
-                // Add new event to array
-                events.push({ title, date });
-                // Save to local storage
+            if (title && date && time) {
+                events.push({ title, date, time }); // ✅ Include time
                 localStorage.setItem('events', JSON.stringify(events));
-                // Hide form and clear inputs
                 document.getElementById('eventForm').style.display = 'none';
                 document.getElementById('eventTitle').value = '';
                 document.getElementById('eventDate').value = '';
-                // Update the UI
+                document.getElementById('eventTime').value = ''; // ✅ Clear time input
                 displayEvents();
             }
         });
 
-        // Function to calculate days left and update UI
+        // Function to calculate time left and update UI
         function displayEvents() {
             const eventList = document.getElementById('eventList');
             eventList.innerHTML = ''; // Clear current list
 
-            events.forEach((event, index) => {
-                const eventDate = new Date(event.date);
+            events.forEach((event) => {
+                const eventDateTime = new Date(`${event.date}T${event.time}`);
                 const now = new Date();
-                const timeDiff = eventDate - now;
-                const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)); // Convert ms to days
+                const timeDiff = eventDateTime - now;
 
-                // Create a div for each event
-                const eventDiv = document.createElement('div');
-                eventDiv.innerHTML = `${event.title} - ${daysLeft} days left`;
-                eventList.appendChild(eventDiv);
+                if (timeDiff >= 0) {
+                    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+
+                    const eventDiv = document.createElement('div');
+                    eventDiv.innerHTML = `${event.title} at ${event.time} - ${days}d ${hours}h ${minutes}m left`;
+                    eventList.appendChild(eventDiv);
+                }
             });
         }
 
