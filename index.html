@@ -3,6 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <title>Countdown Clash</title>
+
+    <!-- Retro Arcade Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #000;
+            color: #00ff99;
+            font-family: 'Press Start 2P', cursive;
+            padding: 20px;
+            text-shadow: 0 0 5px #00ff99;
+        }
+
+        button {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            padding: 10px 20px;
+            background-color: #ff0066;
+            color: #fff;
+            border: 2px solid #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            text-shadow: 0 0 3px #fff;
+            box-shadow: 0 0 10px #ff0066;
+            transition: transform 0.2s ease;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+            background-color: #ff3399;
+        }
+
+        #eventForm input {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #111;
+            color: #00ff99;
+            border: 2px solid #00ff99;
+            padding: 10px;
+            margin: 5px 0;
+            width: 90%;
+            display: block;
+            text-shadow: 0 0 3px #00ff99;
+        }
+
+        #eventList div {
+            background-color: #111;
+            border: 2px dashed #00ff99;
+            margin: 10px 0;
+            padding: 10px;
+            color: #00ff99;
+            text-shadow: 0 0 5px #00ff99;
+        }
+    </style>
 </head>
 <body>
     <!-- Button to add new event -->
@@ -12,7 +65,7 @@
     <div id="eventForm" style="display: none;">
         <input type="text" id="eventTitle" placeholder="Event Title">
         <input type="date" id="eventDate">
-        <input type="time" id="eventTime"> <!-- ✅ Time input added -->
+        <input type="time" id="eventTime">
         <button id="submitBtn">✓</button>
     </div>
 
@@ -32,16 +85,16 @@
         document.getElementById('submitBtn').addEventListener('click', () => {
             const title = document.getElementById('eventTitle').value;
             const date = document.getElementById('eventDate').value;
-            const time = document.getElementById('eventTime').value; // ✅ Get time
+            const time = document.getElementById('eventTime').value;
 
             // Check if inputs are filled
             if (title && date && time) {
-                events.push({ title, date, time }); // ✅ Include time
+                events.push({ title, date, time });
                 localStorage.setItem('events', JSON.stringify(events));
                 document.getElementById('eventForm').style.display = 'none';
                 document.getElementById('eventTitle').value = '';
                 document.getElementById('eventDate').value = '';
-                document.getElementById('eventTime').value = ''; // ✅ Clear time input
+                document.getElementById('eventTime').value = '';
                 displayEvents();
             }
         });
@@ -49,7 +102,7 @@
         // Function to calculate time left and update UI
         function displayEvents() {
             const eventList = document.getElementById('eventList');
-            eventList.innerHTML = ''; // Clear current list
+            eventList.innerHTML = '';
 
             events.forEach((event) => {
                 const eventDateTime = new Date(`${event.date}T${event.time}`);
