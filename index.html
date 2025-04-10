@@ -3,6 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <title>Countdown Clash</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background: radial-gradient(circle at center, #000 0%, #111 100%);
+            color: #39ff14;
+            font-family: 'Press Start 2P', monospace;
+            padding: 20px;
+            text-align: center;
+        }
+
+        button {
+            font-family: 'Press Start 2P', monospace;
+            background-color: #ff006e;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 0 10px #ff006e;
+            margin: 10px;
+            border-radius: 5px;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+            background-color: #ff1493;
+        }
+
+        input {
+            font-family: 'Press Start 2P', monospace;
+            background: #000;
+            color: #0ff;
+            border: 2px solid #0ff;
+            padding: 10px;
+            margin: 5px;
+            width: 80%;
+            max-width: 300px;
+            font-size: 12px;
+            box-shadow: 0 0 5px #0ff;
+        }
+
+        #eventList > div {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed #ff0;
+            margin: 10px auto;
+            padding: 15px;
+            width: 90%;
+            max-width: 500px;
+            color: #fff;
+            font-size: 12px;
+            box-shadow: 0 0 10px #ff0;
+        }
+
+        #eventForm {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     <!-- Button to add new event -->
@@ -12,7 +71,7 @@
     <div id="eventForm" style="display: none;">
         <input type="text" id="eventTitle" placeholder="Event Title">
         <input type="date" id="eventDate">
-        <input type="time" id="eventTime"> <!-- ✅ Time input added -->
+        <input type="time" id="eventTime">
         <button id="submitBtn">✓</button>
     </div>
 
@@ -20,60 +79,55 @@
     <div id="eventList"></div>
 
     <script>
-        // Load events from local storage when page loads
         let events = JSON.parse(localStorage.getItem('events')) || [];
 
-        // Show the form when "+" is clicked
         document.getElementById('addBtn').addEventListener('click', () => {
             document.getElementById('eventForm').style.display = 'block';
         });
 
-        // Handle form submission when "tick" is clicked
         document.getElementById('submitBtn').addEventListener('click', () => {
             const title = document.getElementById('eventTitle').value;
             const date = document.getElementById('eventDate').value;
-            const time = document.getElementById('eventTime').value; // ✅ Get time
+            const time = document.getElementById('eventTime').value;
 
-            // Check if inputs are filled
             if (title && date && time) {
-                events.push({ title, date, time }); // ✅ Include time
+                events.push({ title, date, time });
                 localStorage.setItem('events', JSON.stringify(events));
                 document.getElementById('eventForm').style.display = 'none';
                 document.getElementById('eventTitle').value = '';
                 document.getElementById('eventDate').value = '';
-                document.getElementById('eventTime').value = ''; // ✅ Clear time input
+                document.getElementById('eventTime').value = '';
                 displayEvents();
             }
         });
 
-        // Function to calculate time left and update UI
-function displayEvents() {
-    const eventList = document.getElementById('eventList');
-    eventList.innerHTML = ''; // Clear current list
+        function displayEvents() {
+            const eventList = document.getElementById('eventList');
+            eventList.innerHTML = '';
+            const now = new Date();
 
-    const now = new Date();
+            const sortedEvents = events
+                .map(event => ({
+                    ...event,
+                    eventDateTime: new Date(`${event.date}T${event.time}`)
+                }))
+                .filter(event => event.eventDateTime - now >= 0)
+                .sort((a, b) => a.eventDateTime - b.eventDateTime);
 
-    // Sort events by date + time (earliest first)
-    const sortedEvents = events
-        .map(event => {
-            return {
-                ...event,
-                eventDateTime: new Date(`${event.date}T${event.time}`)
-            };
-        })
-        .filter(event => event.eventDateTime - now >= 0) // Keep only future events
-        .sort((a, b) => a.eventDateTime - b.eventDateTime); // Sort by soonest
+            sortedEvents.forEach((event) => {
+                const timeDiff = event.eventDateTime - now;
+                const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
 
-    // Display sorted events
-    sortedEvents.forEach((event) => {
-        const timeDiff = event.eventDateTime - now;
-        const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                const eventDiv = document.createElement('div');
+                eventDiv.innerHTML = `${event.title} at ${event.time} - ${days}d ${hours}h ${minutes}m left`;
+                eventList.appendChild(eventDiv);
+            });
+        }
 
-        const eventDiv = document.createElement('div');
-        eventDiv.innerHTML = `${event.title} at ${event.time} - ${days}d ${hours}h ${minutes}m left`;
-        eventList.appendChild(eventDiv);
-    });
-}
-
+        // Initial load
+        displayEvents();
+    </script>
+</body>
+</html>
