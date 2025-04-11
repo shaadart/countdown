@@ -19,13 +19,4 @@
 
 ---
 
-### 🎨 Style
-
-Everything's wrapped in a punchy palette:
-- Primary: `#000`
-- Accent: `#f00000`
-- Highlight: `#0044ff`
-- Backgrounds: Pale retro whites and soft grays
-- Shadowed boxes and subtle hover effects
-
 ![Alt Text](https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExb2VkcGVoMGZ4ZDJhdW51OHd2cjA0OWNheHVwN2ExbjJzY3RhYnd0ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/LV8clUpgLSsyIx4sd6/giphy.gif)
