@@ -3,8 +3,7 @@
 
 
 ## 🕹️ DADLINE
-
-> _Built to remind all of us, just like Dad did, but with less lectures._
+Built to remind all of us, just like Dad did, but with less lectures.
 
 ### ✨ Features
 
